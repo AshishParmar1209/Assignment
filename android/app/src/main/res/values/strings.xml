@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Assignment</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAkX_icsRgof_040_euH_T6VTyd34g5djI</string>
+</resources>
