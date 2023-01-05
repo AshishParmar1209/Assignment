@@ -8,6 +8,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {StackActions} from '@react-navigation/native';
@@ -20,14 +21,23 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 
 const HomeScreen = ({navigation}) => {
   const [products, setProducts] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingImg, setLoadingImg] = useState(false);
   useEffect(() => {
     getAllProducts();
   }, []);
 
   const getAllProducts = async () => {
-    const resp = await Axios.get('https://fakestoreapi.com/products');
-    console.warn(resp.data);
-    setProducts(resp.data);
+    try {
+      setIsLoading(true);
+      const resp = await Axios.get('https://fakestoreapi.com/products');
+      console.warn(resp.data);
+      setProducts(resp.data);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.log('error', error);
+    }
   };
 
   const doUserLogOut = async () => {
@@ -43,15 +53,21 @@ const HomeScreen = ({navigation}) => {
     <TouchableOpacity
       style={styles.card}
       onPress={() => navigation.navigate('Map')}>
-      <View>
+      <View style={{flex: 1}}>
         <Image
           source={{uri: item.image}}
+          onLoadStart={() => setLoadingImg(true)}
+          onLoadEnd={() => setLoadingImg(false)}
           style={{
-            height: SCREEN_HEIGHT / 6,
+            height: '70%',
             width: SCREEN_HEIGHT / 6,
             borderRadius: 12,
             marginTop: 8,
           }}
+        />
+        <ActivityIndicator
+          style={styles.activityIndicator}
+          animating={loadingImg}
         />
         <View
           style={{
@@ -59,7 +75,7 @@ const HomeScreen = ({navigation}) => {
             flex: 1,
             borderRadius: 12,
             // alignItems: 'center',
-            justifyContent: 'center',
+            // justifyContent: 'center',
           }}>
           <Text
             numberOfLines={2}
@@ -67,44 +83,69 @@ const HomeScreen = ({navigation}) => {
               color: 'grey',
               fontSize: 14,
               marginTop: 8,
-              marginHorizontal: 4,
-              margin: 8,
+              // marginHorizontal: 4,
+              // margin: 8,
             }}>
             {item.category}
           </Text>
-          <Text
-            numberOfLines={1}
-            style={{
-              color: 'black',
-              fontSize: 14,
-              fontWeight: '700',
-              flex: 1,
-              margin: 4,
-            }}>
-            {item.title}
-          </Text>
-          <Text
-            // numberOfLines={2}
-            style={{
-              color: 'black',
-              fontSize: 14,
-              fontWeight: '700',
-              // flex: 1,
-              margin: 4,
-            }}>
-            {'$' + item.price}
-          </Text>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text
+              numberOfLines={2}
+              style={{
+                color: 'black',
+                fontSize: 12,
+                fontWeight: '700',
+                flex: 1,
+                // margin: 4,
+              }}>
+              {item.title}
+            </Text>
+            <Text
+              // numberOfLines={2}
+              style={{
+                color: 'red',
+                fontSize: 14,
+                fontWeight: '700',
+                // flex: 1,
+                margin: 4,
+              }}>
+              {'$' + item.price}
+            </Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
   );
 
+  const customLoader = () => {
+    return (
+      isLoading && (
+        <ActivityIndicator
+          style={{
+            position: 'absolute',
+            zIndex: 2,
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.3)',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          size="large"
+          visible={isLoading}
+        />
+      )
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
+        {customLoader()}
         <View style={styles.HeaderContainer}>
           <View style={{flex: 1, justifyContent: 'center'}}>
-            <Text style={styles.headertxt}>Home</Text>
+            <Text style={styles.headertxt}>Products</Text>
           </View>
 
           {/* <View
@@ -117,9 +158,9 @@ const HomeScreen = ({navigation}) => {
             </TouchableOpacity>
           </View> */}
         </View>
-        <View style={{justifyContent: 'center', marginVertical: 10}}>
+        {/* <View style={{justifyContent: 'center', marginVertical: 10}}>
           <Text style={styles.headertxt}>Products : </Text>
-        </View>
+        </View> */}
         <FlatList
           contentContainerStyle={{marginHorizontal: 8}}
           data={products}
@@ -175,12 +216,12 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    elevation: 5,
+    elevation: 8,
     alignItems: 'center',
     // backgroundColor: Colors.WHITE,
     backgroundColor: 'white',
     borderRadius: 12,
-    height: SCREEN_HEIGHT / 3.5,
+    height: SCREEN_HEIGHT / 3,
     // width: SCREEN_WIDTH / 2 - 50,
     margin: 8,
     flex: 1,
@@ -191,5 +232,12 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     color: 'skyblue',
+  },
+  activityIndicator: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
   },
 });

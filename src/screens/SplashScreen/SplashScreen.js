@@ -9,7 +9,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect} from 'react';
-import {SafeAreaView, StyleSheet, View, Text} from 'react-native';
+import {SafeAreaView, StyleSheet, View, Text, Image} from 'react-native';
 
 const SplashScreen = ({navigation}) => {
   const onLoad = () => {
@@ -35,7 +35,11 @@ const SplashScreen = ({navigation}) => {
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <Text style={styles.text}>Welcome to Assignment App</Text>
+        <Image
+          style={{height: 100, width: 100, marginVertical: 10}}
+          source={require('../../../android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png')}
+        />
+        <Text style={styles.text}>Welcome to Assignment</Text>
       </View>
     </SafeAreaView>
   );
